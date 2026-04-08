@@ -113,8 +113,10 @@ Stress-test for boundary conditions and unexpected input types.
 All **21 tests** should pass. The HTML report (`playwright-report/index.html`) provides a detailed breakdown per suite.
 
 ---
+## Video Demo Automation API Testing
+https://github.com/user-attachments/assets/99e34b02-caeb-49f5-a6a0-50a1e62b9e4e
 
 ## 👤 Author
 
-Built as a professional QA Automation portfolio project.  
+Muhammad Adam Romadhon
 Framework: **Playwright Test** | Language: **TypeScript** | API: **JSONPlaceholder**
