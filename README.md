@@ -2,6 +2,67 @@
 
 A professional API test automation suite built with **Playwright Test** and **TypeScript**, targeting the [JSONPlaceholder](https://jsonplaceholder.typicode.com) REST API. This project demonstrates real-world QA engineering practices including positive, negative, and edge-case test coverage.
 
+
+
+## 📋 Test Scenarios
+
+### Suite 1 — GET /posts
+
+| No | Test Case | Input | Expected Result | Type |
+|----|-----------|-------|-----------------|------|
+| TC-01 | Status code is 200 | `GET /posts` | HTTP 200 OK | ✅ Positive |
+| TC-02 | Response is a non-empty array | `GET /posts` | `Array.isArray` = true, length > 0 | ✅ Positive |
+| TC-03 | Each post has correct field types | `GET /posts` | All posts have `userId` (number), `id` (number), `title` (string), `body` (string) | ✅ Positive |
+| TC-04 | Full dataset returns exactly 100 posts | `GET /posts` | `posts.length === 100` | ✅ Positive |
+
+---
+
+### Suite 2 — GET /posts/{id}
+
+| No | Test Case | Input | Expected Result | Type |
+|----|-----------|-------|-----------------|------|
+| TC-05 | Valid ID returns status 200 | `GET /posts/1` | HTTP 200 OK | ✅ Positive |
+| TC-06 | Response contains correct post ID | `GET /posts/5` | `post.id === 5` | ✅ Positive |
+| TC-07 | Response matches Post schema | `GET /posts/1` | Fields `userId`, `id`, `title`, `body` present with correct types | ✅ Positive |
+| TC-08 | Invalid ID (9999) returns 404 or empty object | `GET /posts/9999` | HTTP 404 OR empty object `{}` | ❌ Negative |
+| TC-09 | Multiple valid IDs return correct data | `GET /posts/1,10,50,100` | Each response returns HTTP 200 with matching `id` | ✅ Positive |
+
+---
+
+### Suite 3 — POST /posts
+
+| No | Test Case | Input | Expected Result | Type |
+|----|-----------|-------|-----------------|------|
+| TC-10 | Valid payload returns status 201 | `{ title, body, userId: 1 }` | HTTP 201 Created | ✅ Positive |
+| TC-11 | Response contains auto-generated id | `{ title, body, userId: 1 }` | `post.id` is a number > 0 | ✅ Positive |
+| TC-12 | Response echoes back title, body, userId | `{ title: "test title", body: "test body", userId: 1 }` | Response matches all three fields exactly | ✅ Positive |
+
+---
+
+### Suite 4 — Negative Test Cases
+
+| No | Test Case | Input | Expected Result | Type |
+|----|-----------|-------|-----------------|------|
+| TC-13 | POST with missing fields | `{ title: "only title" }` — no `body` or `userId` | HTTP 201 (mock) or 400 (strict) | ❌ Negative |
+| TC-14 | POST with empty body object | `{}` | HTTP 201 (mock) or 400 (strict) | ❌ Negative |
+| TC-15 | GET invalid endpoint returns 404 | `GET /invalid-endpoint-xyz` | HTTP 404 Not Found | ❌ Negative |
+| TC-16 | POST to non-existent resource returns 404 | `POST /nonexistent/resource` | HTTP 404 Not Found | ❌ Negative |
+
+---
+
+### Suite 5 — Edge Cases
+
+| No | Test Case | Input | Expected Result | Type |
+|----|-----------|-------|-----------------|------|
+| TC-17 | Very long title (5 000 chars) | `title: "A".repeat(5000)` | Status < 500; if 201, title echoed back correctly | ⚠️ Edge |
+| TC-18 | Very long body (10 000 chars) | `body: "B".repeat(10000)` | Status < 500 | ⚠️ Edge |
+| TC-19 | Special characters in title | `title: "!@#$%^&*()..."` | HTTP 201, special chars preserved in response | ⚠️ Edge |
+| TC-20 | XSS / HTML injection in body | `body: "<script>alert('xss')</script>"` | HTTP 201, raw string preserved (not executed) | ⚠️ Edge |
+| TC-21 | userId as string instead of number | `userId: "1"` (string) | HTTP 201 (type coercion) or 400 (strict) | ⚠️ Edge |
+| TC-22 | Query parameter filter `?userId=1` | `GET /posts?userId=1` | HTTP 200, all returned posts have `userId === 1` | ⚠️ Edge |
+
+---
+
 ---
 
 ## 🛠 Tools & Technologies
@@ -12,20 +73,6 @@ A professional API test automation suite built with **Playwright Test** and **Ty
 | [TypeScript](https://www.typescriptlang.org/) | ^5.4.5 | Type-safe test authoring |
 | Node.js | ≥18.x | Runtime environment |
 | JSONPlaceholder | – | Free fake REST API (base URL) |
-
----
-
-## 📁 Project Structure
-
-```
-qa-automation-test/
-├── tests/
-│   └── api.spec.ts       # All API test cases
-├── playwright.config.ts  # Playwright configuration
-├── tsconfig.json         # TypeScript compiler options
-├── package.json          # Dependencies & npm scripts
-└── README.md             # Project documentation
-```
 
 ---
 
@@ -101,7 +148,7 @@ Stress-test for boundary conditions and unexpected input types.
 
 - **`request` fixture** — Playwright's built-in `APIRequestContext` is used directly via the `request` fixture; no third-party HTTP client is needed.
 - **`async/await`** — All network calls use `async/await` for readability and reliable error propagation.
-- **`test.describe` grouping** — Tests are organised into four logical groups for clear reporting.
+- **`test.describe` grouping** — Tests are organised into five logical groups for clear reporting.
 - **Typed interfaces** — A `Post` TypeScript interface enforces correct shapes throughout every test.
 - **`assertPostSchema` helper** — A reusable utility validates the Post schema, avoiding repetition across suites.
 - **Conditional negative assertions** — Where JSONPlaceholder behaves differently from a production API (e.g. returning 201 for empty bodies), tests document both valid outcomes with `expect([200, 201, 400]).toContain(...)`.
@@ -110,13 +157,9 @@ Stress-test for boundary conditions and unexpected input types.
 
 ## 📊 Expected Results
 
-All **21 tests** should pass. The HTML report (`playwright-report/index.html`) provides a detailed breakdown per suite.
+All **22 tests** should pass. The HTML report (`playwright-report/index.html`) provides a detailed breakdown per suite.
 
 ---
 ## Video Demo Automation API Testing
 https://github.com/user-attachments/assets/99e34b02-caeb-49f5-a6a0-50a1e62b9e4e
 
-## 👤 Author
-
-Muhammad Adam Romadhon
-Framework: **Playwright Test** | Language: **TypeScript** | API: **JSONPlaceholder**
