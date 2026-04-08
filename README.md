@@ -3,7 +3,6 @@
 A professional API test automation suite built with **Playwright Test** and **TypeScript**, targeting the [JSONPlaceholder](https://jsonplaceholder.typicode.com) REST API. This project demonstrates real-world QA engineering practices including positive, negative, and edge-case test coverage.
 
 
-
 ## 📋 Test Scenarios
 
 ### Suite 1 — GET /posts
@@ -60,8 +59,6 @@ A professional API test automation suite built with **Playwright Test** and **Ty
 | TC-20 | XSS / HTML injection in body | `body: "<script>alert('xss')</script>"` | HTTP 201, raw string preserved (not executed) | ⚠️ Edge |
 | TC-21 | userId as string instead of number | `userId: "1"` (string) | HTTP 201 (type coercion) or 400 (strict) | ⚠️ Edge |
 | TC-22 | Query parameter filter `?userId=1` | `GET /posts?userId=1` | HTTP 200, all returned posts have `userId === 1` | ⚠️ Edge |
-
----
 
 ---
 
